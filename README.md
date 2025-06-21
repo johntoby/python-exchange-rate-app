@@ -1,6 +1,7 @@
 # NGN to USD Exchange Rate Application
 
-This is simple Python web application I built that fetches and displays the current exchange rate between Nigerian Naira (NGN) and US Dollar (USD) in real-time.
+This is simple Python web application I built that fetches and displays the current exchange rate between Nigerian Naira (NGN) and US Dollar (USD) in real-time. The application is containerized using docker, and deployed on a kubernetes cluster using Minikube. The entire process is automated end to end using a GitHub Actions pipeline that runs whenever there's a push to the main branch.
+
 
 ## Features
 
@@ -18,6 +19,11 @@ This is simple Python web application I built that fetches and displays the curr
 - **Requests**: HTTP library for API calls
 - **Docker**: Containerization for consistent deployment
 - **ExchangeRate-API**: Free currency exchange rate API
+- **Docker**: To containerize the application
+- **Minikube**: A lightweight kubernetes dpeloyment environment that uses one node to run both the control plan and worker nodes
+- **GitHub Actions**: For automating the creation of docker containers and running the contaoners in the kubernetes cluster
+
+
 
 ## Project Structure
 
@@ -164,9 +170,26 @@ Automated deployment pipeline using GitHub Actions that:
 2. **Deploy Stage**: SSH into EC2, builds image, loads into minikube
 3. **Kubernetes Deploy**: Applies manifests and monitors rollout
 
-The application runs on `http://<EC2_IP>:30080` after successful deployment.
+The service is exposed using ClusterIP.
 
-![app running successfuly](image.png)
+To access the App on your browser, open a new ssh terminal and run this command to automatically port-forward your node port to your local host port
+
+```bash
+ssh -L 5000:localhost:5000 -i path/to/your/keypair ubuntu@ec2-ip-address
+
+```
+Inside your terminal run this command to port-ward your service from your cluster to your node port
+
+
+```bash
+kubectl port-forward service/exchange-rate-service 5000:80 
+```
+
+
+The application can be assessed on localhost:5000 after successful deployment.
+
+![app running successfully on loacalhost:5000](<Screenshot (651).png>)
+
 
 
 
