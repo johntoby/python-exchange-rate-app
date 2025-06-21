@@ -23,11 +23,15 @@ This is simple Python web application I built that fetches and displays the curr
 
 ```
 cicd-python-application/
-├── app.py              # Main application file
-├── requirements.txt    # Python dependencies
-├── Dockerfile         # Docker configuration
-├── README.md          # Project documentation
-└── LICENSE           # License file
+├── app.py                    # Main application file
+├── requirements.txt          # Python dependencies
+├── Dockerfile               # Docker configuration
+├── deployment.yml           # Kubernetes deployment manifest
+├── service.yml              # Kubernetes service manifest
+├── .github/workflows/       # CI/CD pipeline
+│   └── deploy.yml          # GitHub Actions workflow
+├── README.md               # Project documentation
+└── LICENSE                 # License file
 ```
 
 ## Installation & Setup
@@ -116,32 +120,53 @@ The application handles various error scenarios:
 ### Docker Deployment
 The application is containerized using Docker for consistent deployment across environments.
 
-### CI/CD Pipeline
+### Kubernetes Deployment with Minikube
+
+The application can be deployed to Kubernetes using minikube running on an AWS EC2 instance.
+
+#### Prerequisites:
+- AWS EC2 instance with Docker, kubectl, and minikube installed
+- Minikube cluster running on the EC2 instance
+
+#### Deployment Files:
+- `deployment.yml` - Kubernetes deployment with 2 replicas
+- `service.yml` - NodePort service exposing the app on port 30080
+
+#### Manual Deployment:
+```bash
+# Build and load Docker image
+docker build -t exchange-rate-app:latest .
+minikube image load exchange-rate-app:latest
+
+# Deploy to Kubernetes
+kubectl apply -f deployment.yml
+kubectl apply -f service.yml
+
+# Get service URL
+minikube service exchange-rate-service --url
+```
+
+#### CI/CD Pipeline
 Automated deployment pipeline using GitHub Actions that:
-- Builds and tags Docker images on every push to main branch
-- Pushes images to Docker Hub with `latest` and commit SHA tags
-- Deploys containerized application to AWS EC2 instance
-- Ensures zero-downtime deployment with container restart policies
+- Connects to AWS EC2 instance via SSH
+- Builds Docker image and loads it into minikube
+- Deploys application to Kubernetes cluster
+- Monitors deployment rollout status
 
 #### Required GitHub Secrets:
-- `DOCKER_USERNAME` - Docker Hub username
-- `DOCKER_PASSWORD` - Docker Hub password/token
-- `EC2_HOST` - AWS EC2 instance IP address
-- `EC2_USERNAME` - EC2 SSH username (ec2-user/ubuntu)
-- `EC2_SSH_KEY` - Private SSH key for EC2 access
+- `AWS_ACCESS_KEY_ID` - AWS access key
+- `AWS_SECRET_ACCESS_KEY` - AWS secret key
+- `EC2_SSH_KEY` - Private SSH key for EC2 instance
+- `EC2_HOST` - Public IP/hostname of EC2 instance
 
 #### Pipeline Workflow:
 1. **Build Stage**: Creates Docker image from source code
-2. **Push Stage**: Uploads tagged images to Docker Hub registry
-3. **Deploy Stage**: SSH into EC2, pulls latest image, and restarts container
+2. **Deploy Stage**: SSH into EC2, builds image, loads into minikube
+3. **Kubernetes Deploy**: Applies manifests and monitors rollout
 
-The application runs on port 80 of the EC2 instance after successful deployment.
+The application runs on `http://<EC2_IP>:30080` after successful deployment.
 
-![success](<Screenshot (643)-1.png>)
-
-![pipeline success](<Screenshot (644)-1.png>)
-
-![application running on port 80](<Screenshot (645).png>)
+![app running successfuly](image.png)
 
 
 

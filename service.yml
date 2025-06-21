@@ -5,10 +5,9 @@ metadata:
   labels:
     app: exchange-rate-app
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
   - port: 80
     targetPort: 5000
-    nodePort: 30080
   selector:
     app: exchange-rate-app
