@@ -26,7 +26,8 @@ jobs:
         echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
         chmod 600 private_key.pem
         
-        # Copy files to EC2 instance
+        # Clean app directory and copy files
+        ssh -i private_key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} "rm -rf /home/ubuntu/app && mkdir -p /home/ubuntu/app"
         scp -i private_key.pem -o StrictHostKeyChecking=no -r . ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/app/
         
         # SSH into instance and deploy
