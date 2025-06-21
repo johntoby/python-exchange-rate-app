@@ -27,11 +27,10 @@ jobs:
         chmod 600 private_key.pem
         
         # Copy files to EC2 instance
-        scp -i private_key.pem -o StrictHostKeyChecking=no -r . ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/app/
+        scp -i private_key.pem -o StrictHostKeyChecking=no -r . ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/app/
         
         # SSH into instance and deploy
-        ssh -i private_key.pem -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
-          mkdir app
+        ssh -i private_key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
           cd /home/ubuntu/app
           
           # Build Docker image
