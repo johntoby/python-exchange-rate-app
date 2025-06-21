@@ -186,7 +186,7 @@ kubectl port-forward service/exchange-rate-service 5000:80
 ```
 
 
-The application can be assessed on localhost:5000 after successful deployment.
+The application can be assessed on localhost:5000 after successful deployment to Kubernetes.
 
 ![app running successfully on loacalhost:5000](<Screenshot (651).png>)
 
