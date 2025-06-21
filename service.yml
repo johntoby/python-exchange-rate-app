@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: exchange-rate-service
+  labels:
+    app: exchange-rate-app
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 5000
+    nodePort: 30080
+  selector:
+    app: exchange-rate-app
